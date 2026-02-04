@@ -334,18 +334,18 @@ def train_tab():
                 sampling_rate = gr.Radio(
                     label=i18n("Sampling Rate"),
                     info=i18n("The sampling rate of the audio files."),
-                    choices=["32000", "40000", "48000"],
-                    value="40000",
+                    choices=["32000", "40000", "44000", "44100", "48000"],
+                    value="44100",
                     interactive=True,
                 )
                 vocoder = gr.Radio(
                     label=i18n("Vocoder"),
                     info=i18n(
-                        "Choose the vocoder for audio synthesis:\n- **HiFi-GAN**: Default option, compatible with all clients.\n- **MRF HiFi-GAN**: Higher fidelity, Applio-only.\n- **RefineGAN**: Superior audio quality, Applio-only."
+                        "Using BigVGAN vocoder:\n- **BigVGAN**: High-quality neural vocoder with anti-aliased activations.\n- Supports 44kHz sample rate for superior audio quality."
                     ),
-                    choices=["HiFi-GAN", "RefineGAN"],  # "MRF HiFi-GAN", ],
-                    value="HiFi-GAN",
-                    interactive=True,
+                    choices=["BigVGAN"],
+                    value="BigVGAN",
+                    interactive=False,
                     visible=True,
                 )
         with gr.Accordion(
@@ -935,24 +935,18 @@ def train_tab():
                     }
                 else:
                     return {
-                        "choices": ["32000", "40000", "48000"],
+                        "choices": ["32000", "40000", "44000", "44100", "48000"],
                         "__type__": "update",
-                        "value": "40000",
-                    }, {"interactive": False, "__type__": "update", "value": "HiFi-GAN"}
+                        "value": "44100",
+                    }, {"interactive": False, "__type__": "update", "value": "BigVGAN"}
 
             def toggle_vocoder(vocoder):
-                if vocoder == "HiFi-GAN":
-                    return {
-                        "choices": ["32000", "40000", "48000"],
-                        "__type__": "update",
-                        "value": "40000",
-                    }
-                else:
-                    return {
-                        "choices": ["24000", "32000"],
-                        "__type__": "update",
-                        "value": "32000",
-                    }
+                # BigVGAN supports all sample rates, with 44.1kHz as default
+                return {
+                    "choices": ["32000", "40000", "44000", "44100", "48000"],
+                    "__type__": "update",
+                    "value": "44100",
+                }
 
             def update_slider_visibility(noise_reduction):
                 return gr.update(visible=noise_reduction)
